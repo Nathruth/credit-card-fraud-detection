@@ -65,14 +65,14 @@ The following visualizations were created:
 ![ROC Curve](images/roccurve.png)
 
 
-![Losses](losses.png)
+![Losses](images/losses.png)
 
 
-![Heatmap](heatmap.png)
+![Heatmap](images/heatmap.png)
 
 
 
-![Fraude rate per hour](frauderatehour.png)
+![Fraude rate per hour](images/frauderatehour.png)
 
 Additional feature distributions by class are provided in the Jupyter notebook.
 
