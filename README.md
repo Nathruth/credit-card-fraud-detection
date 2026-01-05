@@ -62,6 +62,18 @@ The following visualizations were created:
 * Fraud rate by hour of day
 * Feature correlation heatmap
 
+![ROC Curve](images/roccurve.png)
+
+
+![Losses](losses.png)
+
+
+![Heatmap](heatmap.png)
+
+
+
+![Fraude rate per hour](frauderatehour.png)
+
 Additional feature distributions by class are provided in the Jupyter notebook.
 
 ---
@@ -249,7 +261,17 @@ curl -X POST -H "Content-Type: application/json" \
      http://localhost:9696/predict
 ```
 
+##  Cloud Deployment (Render)
 
+I deployed the FastAPI inference service to **Render.com** free tier for a live demo.
 
+**Public URL:** [https://capstone1.onrender.com](https://capstone1.onrender.com)
+
+### Test Endpoints
+
+- Health check:
+
+```
+curl https://capstone1.onrender.com/health
 
 
