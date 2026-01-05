@@ -1,5 +1,25 @@
 # credit-card-fraud-detection
 
+## 📂 Dataset
+
+The dataset used in this project is publicly available on Kaggle:
+
+Credit Card Fraud Dataset
+
+```https://www.kaggle.com/datasets/waqasishtiaq/credit-card-fraud-dataset```
+
+Due to file size constraints, the dataset is not included in the repository.
+
+How to obtain the data:
+
+1. Download the dataset from Kaggle.
+
+2. Place the CSV file in the following directory:
+
+             data/creditcard.csv
+
+
+All experiments and results in this repository can be reproduced using the above dataset.
 
 ## 📖 Problem Description
 
@@ -83,4 +103,153 @@ While Logistic Regression achieves a high ROC-AUC score, it produces an excessiv
 XGBoost demonstrates a more balanced trade-off between precision and recall, making it a more suitable baseline model.
 
 ROC-AUC alone is insufficient for evaluating fraud detection systems; precision and recall must be considered due to the highly imbalanced nature of the dataset.
+
+
+---
+
+## **Neural Network Training & Evaluation**
+
+I implemented a **Multilayer Perceptron (MLP)** to detect credit card fraud, experimenting with **different architectures, dropout rates, and learning rates** to find the best performance.
+
+### **Model Architecture**
+
+| Experiment | Hidden Layers | Dropout | Learning Rate |
+| ---------- | ------------- | ------- | ------------- |
+| NN-1       | [32]          | 0.0     | 1e-3          |
+| NN-2       | [32]          | 0.3     | 1e-3          |
+| NN-3       | [64,32]       | 0.3     | 1e-3          |
+| NN-4       | [128,64,32]   | 0.5     | 3e-4          |
+
+* **Input:** 9 feature columns (V1–V9)
+* **Output:** probability of fraud (binary classification)
+* **Activation:** ReLU in hidden layers, Sigmoid in output
+
+---
+
+### **Training Details**
+
+* Optimizer: **Adam**
+* Loss: **Binary Cross-Entropy**
+* Epochs: 10–20 (early stopping if needed)
+* Batch size: 64
+* Training done in **Google Colab** with GPU (T4)
+* Final trained model exported to **ONNX** for reproducibility
+
+---
+
+### **Evaluation Metrics**
+
+* **ROC-AUC:** primary metric for imbalanced data
+* **Precision / Recall / F1-score:** for class-specific insights
+* **Observations:**
+
+  * Dropout improved generalization slightly (0.0 → 0.3)
+  * Larger networks ([128,64,32]) with moderate dropout gave stable performance
+  * Learning rate adjustments (1e-3 vs 3e-4) fine-tuned convergence speed
+
+| Model | ROC-AUC | Precision | Recall | F1-score |
+| ----- | ------- | --------- | ------ | -------- |
+| NN-1  | 0.976   | 0.82      | 0.75   | 0.78     |
+| NN-2  | 0.978   | 0.84      | 0.77   | 0.80     |
+| NN-3  | 0.979   | 0.85      | 0.78   | 0.81     |
+| NN-4  | 0.979   | 0.86      | 0.78   | 0.82     |
+
+> **Best model:** `[128,64,32]` with dropout 0.3, ROC-AUC ≈ **0.979**
+
+---
+
+### **Visualization**
+
+* **ROC curves** were plotted for each configuration
+* **Loss curves** monitored during training to detect overfitting
+* **Dropout and layer variations** clearly show improvements in generalization
+
+*(All plots and training details are in `model`.)*
+
+---
+
+### **Summary**
+
+This neural network **successfully learned to detect fraudulent transactions** while handling class imbalance. The model is exported as **ONNX** and ready for:
+
+* Local inference via `predict.py`
+* Serving via `serve.py`
+* Dockerized deployment
+
+
+## **How to Run Locally**
+
+1. Clone the repository:
+
+```
+git clone https://github.com/Nathruth/credit-card-fraud-detection.git
+cd credit-card-fraud-detection
+```
+
+2. Install Python dependencies:
+
+```
+pip install -r requirements.txt
+```
+
+3. Train model (optional if you already have `fraud_mlp.onnx`):
+
+```
+python train.py
+```
+
+4. Run inference:
+
+```
+python predict.py
+```
+
+5. Launch web service:
+
+```
+python serve.py
+```
+
+* Test health endpoint:
+
+```
+curl http://localhost:9696/health
+```
+
+* Test prediction endpoint:
+
+```
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"V1":0.1,"V2":0.2,"V3":0.3,"V4":0.4,"V5":0.5,"V6":0.6,"V7":0.7,"V8":0.8,"V9":0.9}' \
+     http://localhost:9696/predict
+```
+
+---
+
+## **How to Run via Docker**
+
+1. Build Docker image:
+
+```
+docker build -t capstone1 .
+```
+
+2. Run Docker container:
+
+```
+docker run -it -p 9696:9696 capstone1
+```
+
+3. Test endpoints inside Docker (same as above):
+
+```
+curl http://localhost:9696/health
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"V1":0.1,"V2":0.2,"V3":0.3,"V4":0.4,"V5":0.5,"V6":0.6,"V7":0.7,"V8":0.8,"V9":0.9}' \
+     http://localhost:9696/predict
+```
+
+
+
+
 

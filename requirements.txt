@@ -4,3 +4,8 @@ seaborn
 pandas
 numpy
 matplotlib
+torch
+fastapi
+onnx
+onnxruntime
+uvicorn
