@@ -9,3 +9,7 @@ fastapi
 onnx
 onnxruntime
 uvicorn
+pydantic
+joblib
+os
+

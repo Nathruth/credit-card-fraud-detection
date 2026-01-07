@@ -4,9 +4,13 @@ from torch.utils.data import DataLoader, TensorDataset
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 import os
+import joblib
+
+
+
 
 # Load data
-df = pd.read_csv("data/creditcard.csv")  # adjust path if needed
+df = pd.read_csv("data/creditcard.csv")
 X = df.drop("Class", axis=1)
 y = df["Class"]
 
@@ -19,6 +23,11 @@ X_train, X_test, y_train, y_test = train_test_split(
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
+
+# SAVE SCALER
+os.makedirs("model_nn", exist_ok=True)
+joblib.dump(scaler, "model_nn/scaler.joblib")
+
 
 # Define MLP
 class FraudMLP(nn.Module):
@@ -58,15 +67,18 @@ for epoch in range(epochs):
         epoch_loss += loss.item() * xb.size(0)
     print(f"Epoch {epoch+1}/{epochs} - loss: {epoch_loss/len(loader.dataset):.4f}")
 
+model.eval()
+
+
 # Save model to ONNX
 dummy_input = torch.randn(1, X_train.shape[1])
-os.makedirs("artifacts", exist_ok=True)
+os.makedirs("model_nn", exist_ok=True)
 torch.onnx.export(
     model,
     dummy_input,
-    "artifacts/fraud_mlp.onnx",
+    "model_nn/fraud_mlp.onnx",
     input_names=["input"],
     output_names=["output"],
     opset_version=11
 )
-print("Model saved to artifacts/fraud_mlp.onnx")
+print("Model saved to model_nn/fraud_mlp.onnx")

@@ -1,17 +1,29 @@
-import torch
 import numpy as np
-
-# Load ONNX
 import onnxruntime as ort
-session = ort.InferenceSession("artifacts/fraud_mlp.onnx")
+import joblib
+
+
+session = ort.InferenceSession("model_nn/fraud_mlp.onnx")
+scaler = joblib.load("model_nn/scaler.joblib")
+
+FEATURE_ORDER = [
+    "Time", "Amount",
+    "V1","V2","V3","V4","V5","V6","V7","V8","V9",
+    "V10","V11","V12","V13","V14","V15","V16",
+    "V17","V18","V19","V20","V21","V22","V23",
+    "V24","V25","V26","V27","V28"
+]
 
 def predict(input_dict):
-    # Ensure features are in the correct order
-    features = np.array([list(input_dict.values())], dtype=np.float32)
-    output = session.run(None, {"input": features})
-    prob = 1 / (1 + np.exp(-output[0][0]))  # sigmoid
+    # Build raw feature vector
+    x = np.array([[input_dict[f] for f in FEATURE_ORDER]], dtype=np.float32)
+
+    # APPLY SAME SCALER AS TRAINING
+    x_scaled = scaler.transform(x)
+
+    # ONNX inference
+    logits = session.run(None, {"input": x_scaled})[0][0]
+
+    prob = 1 / (1 + np.exp(-logits))
     return float(prob)
 
-# Example
-sample = {f"V{i}": 0.1 for i in range(1, 10)}
-print("Predicted fraud probability:", predict(sample))
