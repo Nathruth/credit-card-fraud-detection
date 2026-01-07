@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from app.predict import predict
+from predict import predict
 import uvicorn
 
 app = FastAPI()
