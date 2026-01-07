@@ -301,7 +301,10 @@ docker run -it -p 9696:9696 fraud-detection
 
 I deployed the FastAPI inference service to **Render.com** free tier for a live demo.
 
-**Public URL:** [[https://capstone1.onrender.com]](https://credit-card-fraud-detection-an97.onrender.com)
+**Public URL:** 
+```
+https://credit-card-fraud-detection-an97.onrender.com
+```
 
 
 
