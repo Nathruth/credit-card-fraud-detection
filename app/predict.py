@@ -5,8 +5,9 @@ import os
 
 
 BASE_DIR = os.path.dirname(__file__)
-MODEL_PATH = os.path.join(BASE_DIR, "../model_nn/fraud_mlp.onnx")
-SCALER_PATH = os.path.join(BASE_DIR, "../model_nn/scaler.joblib")
+MODEL_PATH = os.path.join(BASE_DIR, "model_nn/fraud_mlp.onnx")
+SCALER_PATH = os.path.join(BASE_DIR, "model_nn/scaler.joblib")
+
 
 
 session = ort.InferenceSession(MODEL_PATH)
