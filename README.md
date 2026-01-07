@@ -251,6 +251,7 @@ curl -X POST -H "Content-Type: application/json" \
 ```
 git clone https://github.com/Nathruth/credit-card-fraud-detection.git
 cd credit-card-fraud-detection
+```
 
 2. Create and activate a virtual environment:
 
@@ -259,21 +260,25 @@ python -m venv .venv
 source .venv/bin/activate  # Linux / macOS
 # OR
 .venv\Scripts\activate     # Windows
+```
 
 3. Install dependencies:
 
 ```
 pip install -r requirements.txt
+```
 
 4. Train the model and generate artifacts:
 
 ```
 python train.py
+```
 
 5. Start the web service:
 
 ```
 python app/serve.py
+```
 
 
 ##  Run with Docker 
@@ -282,11 +287,13 @@ python app/serve.py
 
 ```
 docker build -t fraud-detection .
+```
 
 2. Run the container:
 
 ```
 docker run -it -p 9696:9696 fraud-detection
+```
 
 
 
