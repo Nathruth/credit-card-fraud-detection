@@ -1,10 +1,17 @@
 import numpy as np
 import onnxruntime as ort
 import joblib
+import os
 
 
-session = ort.InferenceSession("model_nn/fraud_mlp.onnx")
-scaler = joblib.load("model_nn/scaler.joblib")
+BASE_DIR = os.path.dirname(__file__)
+MODEL_PATH = os.path.join(BASE_DIR, "../model_nn/fraud_mlp.onnx")
+SCALER_PATH = os.path.join(BASE_DIR, "../model_nn/scaler.joblib")
+
+
+session = ort.InferenceSession(MODEL_PATH)
+scaler = joblib.load(SCALER_PATH)
+
 
 FEATURE_ORDER = [
     "Time", "Amount",
@@ -14,16 +21,13 @@ FEATURE_ORDER = [
     "V24","V25","V26","V27","V28"
 ]
 
+
 def predict(input_dict):
-    # Build raw feature vector
     x = np.array([[input_dict[f] for f in FEATURE_ORDER]], dtype=np.float32)
 
-    # APPLY SAME SCALER AS TRAINING
     x_scaled = scaler.transform(x)
 
-    # ONNX inference
     logits = session.run(None, {"input": x_scaled})[0][0]
 
     prob = 1 / (1 + np.exp(-logits))
     return float(prob)
-
