@@ -295,13 +295,23 @@ docker build -t fraud-detection .
 docker run -it -p 9696:9696 fraud-detection
 ```
 
+3. Test:
+
+```
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"Time": 12345, "Amount": 100.0, "V1": 0.1, ..., "V28": 0.0}' \
+     http://localhost:9696/predict
+```
 
 
 ##  Cloud Deployment (Render)
 
 I deployed the FastAPI inference service to **Render.com** free tier for a live demo.
 
-**Public URL:** [[https://capstone1.onrender.com]](https://credit-card-fraud-detection-an97.onrender.com)
+**Public URL:** 
+```
+https://credit-card-fraud-detection-an97.onrender.com
+```
 
 
 
