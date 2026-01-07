@@ -132,9 +132,13 @@ I implemented a **Multilayer Perceptron (MLP)** to detect credit card fraud, exp
 | NN-3       | [64,32]       | 0.3     | 1e-3          |
 | NN-4       | [128,64,32]   | 0.5     | 3e-4          |
 
-* **Input:** 9 feature columns (V1–V9)
+* **Input:** Shape (284807, 31)
 * **Output:** probability of fraud (binary classification)
 * **Activation:** ReLU in hidden layers, Sigmoid in output
+
+A `StandardScaler` fitted on the training data is saved and reused during
+inference to ensure consistent feature scaling between training and deployment.
+
 
 ---
 
@@ -142,10 +146,12 @@ I implemented a **Multilayer Perceptron (MLP)** to detect credit card fraud, exp
 
 * Optimizer: **Adam**
 * Loss: **Binary Cross-Entropy**
-* Epochs: 10–20 (early stopping if needed)
+* Epochs: 10
 * Batch size: 64
 * Training done in **Google Colab** with GPU (T4)
 * Final trained model exported to **ONNX** for reproducibility
+
+The final exported ONNX model corresponds to experiment **NN-3** (hidden layers [64,32], dropout 0.3, learning rate 1e-3), which achieved the best trade-off between ROC-AUC and stability.
 
 ---
 
@@ -204,7 +210,7 @@ cd credit-card-fraud-detection
 pip install -r requirements.txt
 ```
 
-3. Train model (optional if you already have `fraud_mlp.onnx`):
+3. Train model:
 
 ```
 python train.py
@@ -238,28 +244,51 @@ curl -X POST -H "Content-Type: application/json" \
 
 ---
 
-## **How to Run via Docker**
+## Run Locally
 
-1. Build Docker image:
-
-```
-docker build -t capstone1 .
-```
-
-2. Run Docker container:
+1. Clone the repository:
 
 ```
-docker run -it -p 9696:9696 capstone1
-```
+git clone https://github.com/Nathruth/credit-card-fraud-detection.git
+cd credit-card-fraud-detection
 
-3. Test endpoints inside Docker (same as above):
+2. Create and activate a virtual environment:
 
 ```
-curl http://localhost:9696/health
-curl -X POST -H "Content-Type: application/json" \
-     -d '{"V1":0.1,"V2":0.2,"V3":0.3,"V4":0.4,"V5":0.5,"V6":0.6,"V7":0.7,"V8":0.8,"V9":0.9}' \
-     http://localhost:9696/predict
+python -m venv .venv
+source .venv/bin/activate  # Linux / macOS
+# OR
+.venv\Scripts\activate     # Windows
+
+3. Install dependencies:
+
 ```
+pip install -r requirements.txt
+
+4. Train the model and generate artifacts:
+
+```
+python train.py
+
+5. Start the web service:
+
+```
+python app/serve.py
+
+
+##  Run with Docker 
+
+1. Build the Docker image:
+
+```
+docker build -t fraud-detection .
+
+2. Run the container:
+
+```
+docker run -it -p 9696:9696 fraud-detection
+
+
 
 ##  Cloud Deployment (Render)
 
@@ -267,11 +296,5 @@ I deployed the FastAPI inference service to **Render.com** free tier for a live 
 
 **Public URL:** [[https://capstone1.onrender.com]](https://credit-card-fraud-detection-an97.onrender.com)
 
-### Test Endpoints
-
-- Health check:
-
-```
-curl https://capstone1.onrender.com/health
 
 
